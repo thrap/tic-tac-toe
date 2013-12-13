@@ -1,21 +1,26 @@
 function TicTacToeCtrl($scope) {
+
     var SIZE = 3;
     var EMPTY = ' ';
-    $scope.board = new Array(SIZE*SIZE+1).join(EMPTY).split('');
-    $scope.board[0] = 1;
-    $scope.board[1] = 1;
-    $scope.board[2] = 2;
-
+    var HUMAN = 'O';
+    var COMPUTER = 'X';
+    $scope.board = [];
+    for(var i = 0; i<SIZE; i++) {
+        $scope.board.push(new Array(SIZE+1).join(EMPTY).split(''));
+    }
 
     function Board(board) {
         this.board = board;
 
         this.getSuccessors = function(player) {
             var successors = [];
-            for(var i = 0; i<board.length; ++i) {
-                if (board[i] === EMPTY) {
-                    var newBoard = _.clone(board);
-                    newBoard[i] = player;
+            var flat = _.flatten(board);
+            for(var i = 0; i<flat.length; ++i) {
+                if (flat[i] === EMPTY) {
+                    var newBoard = _.map(board, function(row) {
+                        return _.clone(row);
+                    });
+                    newBoard[Math.floor(i/SIZE)][i%SIZE] = player;
                     successors.push(new Board(newBoard));
                 }
             }
@@ -24,22 +29,22 @@ function TicTacToeCtrl($scope) {
 
         this.isWinner = function(player) {
             for(var i = 0; i<SIZE; i++) {
-                if (board[i*SIZE] === player && board[i*SIZE + 1] === player && board[i*SIZE + 2] === player)
+                if (board[i][0] === player && board[i][1] === player && board[i][2] === player)
                     return true;
-                if (board[i] === player && board[i + SIZE] === player && board[i + 2*SIZE] === player)
+                if (board[0][i] === player && board[1][i] === player && board[2][i] === player)
                     return true;
             }
-            if (board[0] === player && board[SIZE+1] === player && board[2*SIZE+2] === player)
+            if (board[0][0] === player && board[1][1] === player && board[2][2] === player)
                 return true;
 
-            if (board[2] === player && board[SIZE+1] === player && board[2*SIZE] === player)
+            if (board[2][0] === player && board[1][1] === player && board[0][2] === player)
                 return true;
             return false;
         };
     }
 
     function minimax(state) {
-        var successors = state.getSuccessors(2);
+        var successors = state.getSuccessors(COMPUTER);
 
         var max = -Infinity;
         var maxes = [];
@@ -47,8 +52,7 @@ function TicTacToeCtrl($scope) {
             var value = minValue(state, -Infinity, Infinity);
             if (value > max) {
                 maxes = [state];
-                console.log(value);
-                console.log(state.board);
+                max = value;
             } else if (value === max) {
                 maxes.push(state);
             }
@@ -57,13 +61,13 @@ function TicTacToeCtrl($scope) {
     }
 
     function maxValue(state, alpha, beta) {
-        if (state.isWinner(2)) {
+        if (state.isWinner(COMPUTER)) {
             return 1;
         }
-        if (state.isWinner(1)) {
+        if (state.isWinner(HUMAN)) {
             return -1;
         }
-        var successors = state.getSuccessors(2);
+        var successors = state.getSuccessors(COMPUTER);
         if (successors.length == 0)
             return 0;
         for(var i = 0; i<successors.length; i++) {
@@ -76,13 +80,13 @@ function TicTacToeCtrl($scope) {
     }
 
     function minValue(state, alpha, beta) {
-        if (state.isWinner(2)) {
+        if (state.isWinner(COMPUTER)) {
             return 1;
         }
-        if (state.isWinner(1)) {
+        if (state.isWinner(HUMAN)) {
             return -1;
         }
-        var successors = state.getSuccessors(1);
+        var successors = state.getSuccessors(HUMAN);
         if (successors.length == 0)
             return 0;
         for(var i = 0; i<successors.length; i++) {
@@ -94,4 +98,9 @@ function TicTacToeCtrl($scope) {
         return beta;
     }
     $scope.board = minimax(new Board($scope.board)).board;
+
+    $scope.markCell = function(row, col) {
+        $scope.board[row][col] = HUMAN;
+        $scope.board = minimax(new Board($scope.board)).board;
+    }
 }
