@@ -5,15 +5,45 @@
     <script type="text/javascript" src="js/libs/angular.min.js"></script>
     <script type="text/javascript" src="js/libs/underscore-min.js"></script>
     <script type="text/javascript" src="js/tictactoe.ctrl.js"></script>
+    <style>
+        .circle{
+            box-sizing: border-box;
+            height: 90%;
+            width: 90%;
+            border-radius: 50%;
+            margin: 5%;
+            border: 9px solid red;
+            display: block;
+            font-size: 2px;
+        }
+        .cell{
+            margin-left: 4px; border: 1px solid black; display: inline-block;
+            width: 60px; height: 60px;
+        }
+
+        .label{
+            position: absolute;
+
+            width: 60px; height: 60px;
+        }
+        .cross {
+            z-index: -1;
+            font-size: 100px;
+            position: relative;
+            top: -33px;
+            left: 2px;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body ng-app>
     <div ng-controller="TicTacToeCtrl">
         <div ng-repeat="row in board track by $index">
-            <div class="cell" ng-repeat="cell in row track by $index" style="margin: 2px; border: 1px solid black; width: 50px; height: 50px; display: inline-block">
-                <div ng-switch="cell" style="text-align: center; font-size: 30px; margin-top: 7px">
-                    <div ng-switch-when="O">O</div>
-                    <div ng-switch-when="X">X</div>
-                    <div ng-switch-default ng-click="markCell($parent.$parent.$index, $index)" style="cursor: pointer">&nbsp;</div>
+            <div class="cell" ng-repeat="cell in row track by $index">
+                <div ng-switch="cell" class="label">
+                    <div ng-switch-when="O" class="label"><span class="circle">&nbsp;</span></div>
+                    <div ng-switch-when="X" class="label"><span class="cross">&times;</span></div>
+                    <div ng-switch-default ng-click="markCell($parent.$parent.$index, $index)"style="cursor: pointer" class="label">&nbsp;</div>
                 </div>
             </div>
         </div>

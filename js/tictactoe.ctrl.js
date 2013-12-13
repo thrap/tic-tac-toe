@@ -57,6 +57,8 @@ function TicTacToeCtrl($scope) {
                 maxes.push(state);
             }
         });
+        if (max === 1)
+            console.log("Bro, jeg har vunnet as");
         return maxes[_.random(0, maxes.length-1)];
     }
 
