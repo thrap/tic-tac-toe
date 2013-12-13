@@ -47,19 +47,19 @@ function TicTacToeCtrl($scope) {
         var successors = state.getSuccessors(COMPUTER);
 
         var max = -Infinity;
-        var maxes = [];
+        var best = [];
         _.forEach(successors, function(state) {
             var value = minValue(state, -Infinity, Infinity);
             if (value > max) {
-                maxes = [state];
+                best = [state];
                 max = value;
             } else if (value === max) {
-                maxes.push(state);
+                best.push(state);
             }
         });
         if (max === 1)
-            console.log("Bro, jeg har vunnet as");
-        return maxes[_.random(0, maxes.length-1)];
+            console.log("Jeg vinner denne as bro");
+        return best[_.random(0, best.length-1)];
     }
 
     function maxValue(state, alpha, beta) {
@@ -100,9 +100,14 @@ function TicTacToeCtrl($scope) {
         return beta;
     }
     $scope.board = minimax(new Board($scope.board)).board;
+    $scope.gameOver = false;
 
     $scope.markCell = function(row, col) {
+        if ($scope.gameOver)
+            return;
         $scope.board[row][col] = HUMAN;
-        $scope.board = minimax(new Board($scope.board)).board;
+        var newBoard = minimax(new Board($scope.board));
+        $scope.gameOver = newBoard.isWinner(COMPUTER);
+        $scope.board = newBoard.board;
     }
 }
