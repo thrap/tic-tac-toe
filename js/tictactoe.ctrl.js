@@ -106,11 +106,10 @@ function TicTacToeCtrl($scope) {
         $scope.board[row][col] = HUMAN;
         var newBoard = minimax(new Board($scope.board));
         $scope.gameOver = !newBoard || newBoard.isWinner(COMPUTER);
+        $scope.draw = !newBoard || _.flatten(newBoard).filter(function(num){ return num === EMPTY}).length === 0;
         if (!!newBoard) {
             $scope.lost = newBoard.isWinner(COMPUTER);
             $scope.board = newBoard.board;
-        } else {
-            $scope.draw = true;
         }
     };
 
