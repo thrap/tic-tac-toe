@@ -9,17 +9,19 @@ function TicTacToeCtrl($scope) {
         $scope.board.push(new Array(SIZE+1).join(EMPTY).split(''));
     }
 
+    var a = 0;
     function Board(board) {
         this.board = board;
+        if (++a % 1000 === 0) {
+            console.log(a);
+        }
 
         this.getSuccessors = function(player) {
             var successors = [];
             var flat = _.flatten(board);
             for(var i = 0; i<flat.length; ++i) {
                 if (flat[i] === EMPTY) {
-                    var newBoard = _.map(board, function(row) {
-                        return _.clone(row);
-                    });
+                    var newBoard = _.map(board, function(row) {return _.clone(row);});
                     newBoard[Math.floor(i/SIZE)][i%SIZE] = player;
                     successors.push(new Board(newBoard));
                 }
@@ -49,7 +51,7 @@ function TicTacToeCtrl($scope) {
         var max = -Infinity;
         var best = [];
         _.forEach(successors, function(state) {
-            var value = minValue(state, -Infinity, Infinity);
+            var value = state.isWinner(COMPUTER) ? Infinity : minValue(state, -Infinity, Infinity);
             if (value > max) {
                 best = [state];
                 max = value;
@@ -62,6 +64,7 @@ function TicTacToeCtrl($scope) {
         return best[_.random(0, best.length-1)];
     }
 
+    var maxMemoize = {};
     function maxValue(state, alpha, beta) {
         if (state.isWinner(COMPUTER)) {
             return 1;
@@ -69,6 +72,9 @@ function TicTacToeCtrl($scope) {
         if (state.isWinner(HUMAN)) {
             return -1;
         }
+        var memo = _.flatten(state.board).join(',');
+        if (maxMemoize[memo])
+            return maxMemoize[memo];
         var successors = state.getSuccessors(COMPUTER);
         if (successors.length == 0)
             return 0;
@@ -78,9 +84,11 @@ function TicTacToeCtrl($scope) {
             if (beta <= alpha)
                 break;
         }
+        maxMemoize[memo] = alpha;
         return alpha;
     }
 
+    var minMemoize = {};
     function minValue(state, alpha, beta) {
         if (state.isWinner(COMPUTER)) {
             return 1;
@@ -88,6 +96,9 @@ function TicTacToeCtrl($scope) {
         if (state.isWinner(HUMAN)) {
             return -1;
         }
+        var memo = _.flatten(state.board).join(',');
+        if (minMemoize[memo])
+            return minMemoize[memo];
         var successors = state.getSuccessors(HUMAN);
         if (successors.length == 0)
             return 0;
@@ -97,6 +108,7 @@ function TicTacToeCtrl($scope) {
             if (beta <= alpha)
                 break;
         }
+        minMemoize[memo] = beta;
         return beta;
     }
 
@@ -117,4 +129,6 @@ function TicTacToeCtrl($scope) {
     if (Math.random() > 0.5) {
         $scope.board = minimax(new Board($scope.board)).board;
     }
+    console.log(a);
+
 }
