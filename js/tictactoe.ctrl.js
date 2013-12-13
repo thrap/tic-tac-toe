@@ -99,15 +99,23 @@ function TicTacToeCtrl($scope) {
         }
         return beta;
     }
-    $scope.board = minimax(new Board($scope.board)).board;
-    $scope.gameOver = false;
 
     $scope.markCell = function(row, col) {
         if ($scope.gameOver)
             return;
         $scope.board[row][col] = HUMAN;
         var newBoard = minimax(new Board($scope.board));
-        $scope.gameOver = newBoard.isWinner(COMPUTER);
-        $scope.board = newBoard.board;
+        $scope.gameOver = !newBoard || newBoard.isWinner(COMPUTER);
+        if (!!newBoard) {
+            $scope.lost = newBoard.isWinner(COMPUTER);
+            $scope.board = newBoard.board;
+        } else {
+            $scope.draw = true;
+        }
+    };
+
+    $scope.gameOver = false;
+    if (Math.random() > 0.5) {
+        $scope.board = minimax(new Board($scope.board)).board;
     }
 }
